@@ -1,21 +1,36 @@
 package com.example.web.controller;
 
+import com.example.web.dto.ErrorResponse;
+import com.example.web.exception.ErrorCode;
+import com.example.web.exception.WebSampleException;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @Slf4j
 @RestController
 public class SampleController {
     @GetMapping(value = "/order/{orderId}")
-    public String getOrder(@PathVariable("orderId") String orderId) {
+    public String getOrder(@PathVariable("orderId") String orderId) throws SQLIntegrityConstraintViolationException {
         log.info("Get some order information " + orderId);
 
         if ("500".equals(orderId)) {
-            throw new IllegalStateException("500 is not valid orderId");
+            throw new WebSampleException(ErrorCode.TOO_BIG_ID_ERROR, "500 is too big id error");
+        }
+
+        if ("300".equals(orderId)) {
+            throw new WebSampleException(ErrorCode.TOO_SMALL_ID_ERROR, "300 is too small id error");
+        }
+
+        if ("400".equals(orderId)) {
+            throw new SQLIntegrityConstraintViolationException("400 is Duplicated insertion was tried");
         }
 
         return "orderId :" + orderId + " orderAmount = 100";
@@ -48,6 +63,7 @@ public class SampleController {
         log.info("Create Order");
         return "orderId = 2, orderAmount = 1000";
     }
+
 
     @Data
     public static class CreateOrderRequest {
