@@ -13,6 +13,11 @@ public class SampleController {
     @GetMapping(value = "/order/{orderId}")
     public String getOrder(@PathVariable("orderId") String orderId) {
         log.info("Get some order information " + orderId);
+
+        if ("500".equals(orderId)) {
+            throw new IllegalStateException("500 is not valid orderId");
+        }
+
         return "orderId :" + orderId + " orderAmount = 100";
     }
 
@@ -37,6 +42,7 @@ public class SampleController {
         log.info("Create order " + createOrderRequest + " userAccountId " + userAccountId);
         return "orderId :" + createOrderRequest.getOrderId() + " orderAmount = " + createOrderRequest.getOrderAmount();
     }
+
     @PutMapping("/order1")
     public String createOrder() {
         log.info("Create Order");
